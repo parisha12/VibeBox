@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+
+import { useAuth } from '../context/AuthContext';
+import Button from '../components/common/Button';
+import Input from '../components/common/Input';
 
 const Login = () => {
   const { login } = useAuth();
@@ -11,6 +14,8 @@ const Login = () => {
     email: '',
     password: '',
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -23,6 +28,8 @@ const Login = () => {
     e.preventDefault();
 
     try {
+      setLoading(true);
+
       await login(formData);
 
       toast.success('Welcome back to VibeBox 🎀');
@@ -30,91 +37,51 @@ const Login = () => {
       navigate('/');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div
-      className="
-      min-h-screen
-      flex
-      items-center
-      justify-center
-      bg-pink-50
-    "
-    >
-      <div
-        className="
-        bg-white
-        p-8
-        rounded-3xl
-        shadow-lg
-        w-full
-        max-w-md
-      "
-      >
-        <h1
-          className="
-          text-3xl
-          font-bold
-          text-center
-          text-pink-500
-          mb-6
-        "
-        >
+    <div className="min-h-screen flex items-center justify-center bg-pink-50 px-4">
+      <div className="bg-white p-8 rounded-3xl shadow-lg w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center text-pink-500 mb-6">
           🎀 Welcome Back
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
+          <Input
+            label="Email"
             type="email"
             name="email"
-            placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="
-              w-full
-              border
-              p-3
-              rounded-xl
-              focus:outline-pink-400
-            "
+            placeholder="Enter your email"
+            required
           />
 
-          <input
+          <Input
+            label="Password"
             type="password"
             name="password"
-            placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="
-              w-full
-              border
-              p-3
-              rounded-xl
-              focus:outline-pink-400
-            "
+            placeholder="Enter your password"
+            required
           />
 
-          <button
-            className="
-              w-full
-              bg-pink-500
-              text-white
-              py-3
-              rounded-xl
-              hover:bg-pink-600
-              transition
-            "
-          >
-            Login 🎧
-          </button>
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login 🎧'}
+          </Button>
         </form>
 
-        <p className="text-center mt-5 text-gray-500">
-          Don't have an account?
-          <Link to="/register" className="text-pink-500 ml-2 font-semibold">
-            Register
+        <p className="text-center mt-6 text-gray-500">
+          Don't have an account?{' '}
+          <Link
+            to="/register"
+            className="text-pink-600 font-semibold hover:underline"
+          >
+            Create one
           </Link>
         </p>
       </div>

@@ -7,6 +7,9 @@ import Register from '../pages/Register';
 import ProtectedRoute from '../components/common/ProtectedRoute';
 import Layout from '../components/layout/Layout';
 
+import Songs from '../pages/Songs';
+import Favorites from '../pages/Favorites';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -24,11 +27,20 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
 
       <Route
+        path="/songs"
+        element={
+          <Layout>
+            <Songs />
+          </Layout>
+        }
+      />
+
+      <Route
         path="/favorites"
         element={
           <ProtectedRoute>
             <Layout>
-              <h1>Favorites Page</h1>
+              <Favorites />
             </Layout>
           </ProtectedRoute>
         }
