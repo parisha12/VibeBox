@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useContext } from 'react';
 import { MusicContext } from '../../context/MusicContext';
 
 import { searchSongs } from '../../services/searchService';
@@ -44,15 +43,15 @@ const Navbar = () => {
   return (
     <nav
       className="
-      bg-white 
-      shadow-md 
-      px-6 
-      py-4 
-      flex 
-      justify-between 
-      items-center 
-      sticky 
-      top-0 
+      bg-white
+      shadow-md
+      px-6
+      py-4
+      flex
+      justify-between
+      items-center
+      sticky
+      top-0
       z-50
       "
     >
@@ -60,11 +59,11 @@ const Navbar = () => {
       <Link
         to="/"
         className="
-        text-2xl 
-        font-bold 
-        text-pink-500 
-        flex 
-        items-center 
+        text-2xl
+        font-bold
+        text-pink-500
+        flex
+        items-center
         gap-2
         "
       >
@@ -122,15 +121,17 @@ const Navbar = () => {
                   setResults([]);
                 }}
                 className="
-    p-3
-    rounded-lg
-    hover:bg-pink-50
-    cursor-pointer
-    "
+                p-3
+                rounded-lg
+                hover:bg-pink-50
+                cursor-pointer
+                "
               >
                 <p className="font-semibold text-gray-800">{song.title}</p>
 
-                <p className="text-sm text-gray-500">{song.artist}</p>
+                <p className="text-sm text-gray-500">
+                  {song.artist?.name || 'Unknown Artist'}
+                </p>
               </div>
             ))}
           </div>
@@ -140,15 +141,13 @@ const Navbar = () => {
       {/* Right Side */}
 
       <div className="flex items-center gap-5">
-        {/* Favorites */}
-
         {user && (
           <Link to="/favorites">
             <FaHeart
               className="
-              text-pink-500 
-              text-xl 
-              hover:scale-110 
+              text-pink-500
+              text-xl
+              hover:scale-110
               transition
               "
             />
@@ -157,14 +156,12 @@ const Navbar = () => {
 
         {user ? (
           <div className="relative">
-            {/* User Button */}
-
             <button
               onClick={() => setOpen(!open)}
               className="
-              flex 
-              items-center 
-              gap-2 
+              flex
+              items-center
+              gap-2
               text-gray-600
               hover:text-pink-500
               "
@@ -177,8 +174,6 @@ const Navbar = () => {
 
               <FaChevronDown className="text-sm" />
             </button>
-
-            {/* Dropdown */}
 
             {open && (
               <div
@@ -241,6 +236,22 @@ const Navbar = () => {
                 >
                   <FaHistory />
                   Recently Played
+                </Link>
+
+                <Link
+                  to="/upload-song"
+                  onClick={() => setOpen(false)}
+                  className="
+                  flex
+                  items-center
+                  gap-2
+                  px-3
+                  py-2
+                  rounded-lg
+                  hover:bg-pink-50
+                  "
+                >
+                  🎵 Upload Song
                 </Link>
 
                 <button

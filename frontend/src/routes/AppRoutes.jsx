@@ -13,11 +13,12 @@ import Playlists from '../pages/Playlists';
 import PlaylistDetails from '../pages/PlaylistDetails';
 import RecentlyPlayed from '../pages/RecentlyPlayed';
 import Profile from '../pages/Profile';
-import Artists from "../pages/Artists";
-import ArtistDetails from "../pages/ArtistDetails";
+import Artists from '../pages/Artists';
+import ArtistDetails from '../pages/ArtistDetails';
 
-import Albums from "../pages/Albums";
-import AlbumDetails from "../pages/AlbumDetails";
+import Albums from '../pages/Albums';
+import AlbumDetails from '../pages/AlbumDetails';
+import UploadSong from '../pages/UploadSong';
 
 const AppRoutes = () => {
   return (
@@ -96,26 +97,35 @@ const AppRoutes = () => {
       />
       <Route path="/artists" element={<Artists />} />
 
-<Route
- path="/artists/:id"
- element={
-   <ProtectedRoute>
-      <ArtistDetails />
-   </ProtectedRoute>
- }
-/>
+      <Route
+        path="/artists/:id"
+        element={
+          <ProtectedRoute>
+            <ArtistDetails />
+          </ProtectedRoute>
+        }
+      />
 
+      <Route path="/albums" element={<Albums />} />
 
-<Route path="/albums" element={<Albums />} />
-
-<Route
- path="/albums/:id"
- element={
-   <ProtectedRoute>
-      <AlbumDetails />
-   </ProtectedRoute>
- }
-/>
+      <Route
+        path="/albums/:id"
+        element={
+          <ProtectedRoute>
+            <AlbumDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/upload-song"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <UploadSong />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };
