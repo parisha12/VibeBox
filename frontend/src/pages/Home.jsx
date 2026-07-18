@@ -4,42 +4,25 @@ import { Link } from 'react-router-dom';
 import { FaMusic, FaHeart } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
-import api from '../services/api';
+import {
+  getTrendingSongs,
+  getNewReleases,
+  getPopularSongs,
+} from '../services/songService';
+import { getRecentlyPlayed } from '../services/recentlyPlayedService';
+import { getFavorites } from '../services/favoriteService';
+
 import SongCard from '../components/music/SongCard';
 import CategoryCard from '../components/music/CategoryCard';
 import PlaylistCard from '../components/music/PlaylistCard';
 
 const categories = [
-  {
-    id: 1,
-    name: 'Pop',
-    icon: '🎤',
-  },
-  {
-    id: 2,
-    name: 'Lo-Fi',
-    icon: '🌙',
-  },
-  {
-    id: 3,
-    name: 'Rock',
-    icon: '🎸',
-  },
-  {
-    id: 4,
-    name: 'Jazz',
-    icon: '🎷',
-  },
-  {
-    id: 5,
-    name: 'Hip-Hop',
-    icon: '🎧',
-  },
-  {
-    id: 6,
-    name: 'Classical',
-    icon: '🎻',
-  },
+  { id: 1, name: 'Pop', icon: '🎤' },
+  { id: 2, name: 'Lo-Fi', icon: '🌙' },
+  { id: 3, name: 'Rock', icon: '🎸' },
+  { id: 4, name: 'Jazz', icon: '🎷' },
+  { id: 5, name: 'Hip-Hop', icon: '🎧' },
+  { id: 6, name: 'Classical', icon: '🎻' },
 ];
 
 const playlists = [
@@ -64,23 +47,44 @@ const playlists = [
 ];
 
 function Home() {
-  const [featuredSongs, setFeaturedSongs] = useState([]);
+  const [trendingSongs, setTrendingSongs] = useState([]);
+  const [newReleases, setNewReleases] = useState([]);
+  const [popularSongs, setPopularSongs] = useState([]);
+  const [recentSongs, setRecentSongs] = useState([]);
+  const [favoriteSongs, setFavoriteSongs] = useState([]);
+
   const [loadingSongs, setLoadingSongs] = useState(true);
 
   useEffect(() => {
-    const fetchFeaturedSongs = async () => {
+    const fetchHomeData = async () => {
       try {
-        const { data } = await api.get('/songs');
+        const trendingResponse = await getTrendingSongs();
 
-        setFeaturedSongs(data.slice(0, 4));
+        const newReleaseResponse = await getNewReleases();
+
+        const popularResponse = await getPopularSongs();
+
+        setTrendingSongs(trendingResponse.slice(0, 4));
+
+        setNewReleases(newReleaseResponse.slice(0, 4));
+
+        setPopularSongs(popularResponse.slice(0, 4));
+
+        const recentResponse = await getRecentlyPlayed();
+
+        setRecentSongs(recentResponse.slice(0, 4));
+
+        const favoritesResponse = await getFavorites();
+
+        setFavoriteSongs(favoritesResponse.slice(0, 4));
       } catch (error) {
-        toast.error('Failed to load featured songs');
+        toast.error('Failed to load music');
       } finally {
         setLoadingSongs(false);
       }
     };
 
-    fetchFeaturedSongs();
+    fetchHomeData();
   }, []);
 
   return (
@@ -88,18 +92,44 @@ function Home() {
       {/* Hero Section */}
 
       <section
-        className="relative overflow-hidden rounded-3xl 
-        bg-gradient-to-r from-pink-500 via-pink-400 to-fuchsia-500 
-        text-white px-8 py-20 shadow-xl"
+        className="
+        relative 
+        overflow-hidden 
+        rounded-3xl
+        bg-gradient-to-r 
+        from-pink-500 
+        via-pink-400 
+        to-fuchsia-500
+        text-white 
+        px-8 
+        py-20 
+        shadow-xl
+        "
       >
         <div
-          className="absolute -top-24 -right-20 h-72 w-72 
-          rounded-full bg-white/20 blur-3xl"
+          className="
+          absolute 
+          -top-24 
+          -right-20 
+          h-72 
+          w-72
+          rounded-full 
+          bg-white/20 
+          blur-3xl
+          "
         />
 
         <div
-          className="absolute -bottom-20 -left-20 h-64 w-64 
-          rounded-full bg-pink-300/20 blur-3xl"
+          className="
+          absolute 
+          -bottom-20 
+          -left-20 
+          h-64 
+          w-64
+          rounded-full 
+          bg-pink-300/20 
+          blur-3xl
+          "
         />
 
         <motion.div
@@ -109,8 +139,16 @@ function Home() {
           className="relative z-10 max-w-3xl"
         >
           <div
-            className="inline-flex items-center gap-2 
-            rounded-full bg-white/20 px-4 py-2 mb-6"
+            className="
+            inline-flex 
+            items-center 
+            gap-2
+            rounded-full 
+            bg-white/20 
+            px-4 
+            py-2 
+            mb-6
+            "
           >
             <FaMusic />
 
@@ -126,23 +164,42 @@ function Home() {
 
           <p className="mt-6 text-lg text-pink-100 max-w-xl">
             Discover beautiful music, organize playlists, save your favorite
-            songs, and write memories that stay with every vibe.
+            songs, and enjoy every vibe.
           </p>
 
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               to="/songs"
-              className="rounded-full bg-white text-pink-600 
-              px-8 py-3 font-semibold hover:scale-105 transition"
+              className="
+              rounded-full
+              bg-white
+              text-pink-600
+              px-8
+              py-3
+              font-semibold
+              hover:scale-105
+              transition
+              "
             >
               Explore Music
             </Link>
 
             <Link
               to="/playlists"
-              className="rounded-full border border-white 
-              px-8 py-3 font-semibold hover:bg-white 
-              hover:text-pink-600 transition flex items-center gap-2"
+              className="
+              rounded-full
+              border
+              border-white
+              px-8
+              py-3
+              font-semibold
+              hover:bg-white
+              hover:text-pink-600
+              transition
+              flex
+              items-center
+              gap-2
+              "
             >
               <FaHeart />
               My Playlists
@@ -169,12 +226,84 @@ function Home() {
           {loadingSongs ? (
             <p className="text-pink-500">Loading songs 🎵</p>
           ) : (
-            featuredSongs.map((song) => <SongCard key={song._id} song={song} />)
+            trendingSongs.map((song) => <SongCard key={song._id} song={song} />)
           )}
         </div>
       </section>
+      <section>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold text-gray-800">🆕 New Releases</h2>
+        </div>
 
-      {/* Music Categories */}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {newReleases.map((song) => (
+            <SongCard key={song._id} song={song} />
+          ))}
+        </div>
+      </section>
+      <section>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold text-gray-800">⭐ Popular Songs</h2>
+        </div>
+
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {popularSongs.map((song) => (
+            <SongCard key={song._id} song={song} />
+          ))}
+        </div>
+      </section>
+
+      {/* Recently Played */}
+
+      {recentSongs.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-800">
+              Recently Played 🎧
+            </h2>
+
+            <Link
+              to="/recently-played"
+              className="text-pink-500 font-semibold hover:underline"
+            >
+              View History
+            </Link>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {recentSongs.map((song) => (
+              <SongCard key={song._id} song={song} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Favorites */}
+
+      {favoriteSongs.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-800">
+              Your Favorites ❤️
+            </h2>
+
+            <Link
+              to="/favorites"
+              className="text-pink-500 font-semibold hover:underline"
+            >
+              View All
+            </Link>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {favoriteSongs.map((song) => (
+              <SongCard key={song._id} song={song} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Categories */}
 
       <section>
         <h2 className="text-3xl font-bold text-gray-800 mb-8">
@@ -192,9 +321,7 @@ function Home() {
 
       <section>
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">
-            Featured Playlists
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-800">🔥 Trending Now</h2>
 
           <Link
             to="/playlists"

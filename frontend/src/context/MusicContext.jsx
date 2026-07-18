@@ -1,5 +1,10 @@
-import { createContext, useRef, useState, useEffect } from 'react';
+import { createContext, useContext, useRef, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
+import { AuthContext } from './AuthContext';
+
+import { addRecentlyPlayed } from '../services/recentlyPlayedService';
+import { increasePlayCount } from '../services/playService';
 
 import {
   getFavorites,
@@ -12,13 +17,14 @@ export const MusicContext = createContext();
 export function MusicProvider({ children }) {
   const audioRef = useRef(new Audio());
 
+  const { user } = useContext(AuthContext);
+
   const [currentSong, setCurrentSong] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Favorites state ❤️
   const [favorites, setFavorites] = useState([]);
 
   // Load favorites
@@ -39,22 +45,51 @@ export function MusicProvider({ children }) {
     fetchFavorites();
   }, []);
 
-  const playSong = (song) => {
+  // Audio events
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    const updateTime = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const updateDuration = () => {
+      setDuration(audio.duration);
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+    };
+
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('loadedmetadata', updateDuration);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('loadedmetadata', updateDuration);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+
+  const playSong = async (song) => {
     setCurrentSong(song);
 
     audioRef.current.src = song.audioUrl;
 
-    audioRef.current.play();
+    try {
+      await audioRef.current.play();
 
-    setIsPlaying(true);
+      setIsPlaying(true);
 
-    audioRef.current.ontimeupdate = () => {
-      setCurrentTime(audioRef.current.currentTime);
-    };
+      await increasePlayCount(song._id);
 
-    audioRef.current.onloadedmetadata = () => {
-      setDuration(audioRef.current.duration);
-    };
+      if (user) {
+        await addRecentlyPlayed(song._id);
+      }
+    } catch (error) {
+      console.log('Play error:', error);
+    }
   };
 
   const pauseSong = () => {
@@ -106,7 +141,7 @@ export function MusicProvider({ children }) {
     }
   };
 
-  // Check favorite status
+  // Check favorite
   const isFavorite = (songId) => {
     return favorites.some((item) => item.song._id === songId);
   };
